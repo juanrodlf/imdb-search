@@ -8,7 +8,10 @@ import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +25,10 @@ public class SearchController {
 
     @GetMapping("/search")
     public SearchDtoResponse search(@RequestParam String query) {
+        if (query.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "The query cannot be empty.");
+        }
         String clusterName = searchService.getClusterName();
         return new SearchDtoResponse(query, clusterName);
     }

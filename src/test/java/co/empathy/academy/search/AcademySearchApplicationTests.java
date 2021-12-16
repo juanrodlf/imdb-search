@@ -23,23 +23,25 @@ class AcademySearchApplicationTests {
 
 	@Test
 	void searchReturnsQueryAndClusterName() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search?query={query}", "Camisa"))
+		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "Camisa"))
 				.andExpect(MockMvcResultMatchers.status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.query").value("Camisa"))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.clusterName").value("docker-cluster"));
 	}
 
 	@Test
-	void searchReturnsEmptyQueryAndClusterName() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search?query={query}", ""))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.query").value(""))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.clusterName").value("docker-cluster"));
+	void searchBadRequestWithoutQuery() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get("/search"))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 
 	@Test
-	void searchBadRequestWithoutQuery() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search"))
+	void searchEmptyQueryBadRequest() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", ""))
+				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
+				.andExpect(MockMvcResultMatchers.status().isBadRequest());
+		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", " 	 "))
+				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
 				.andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 
