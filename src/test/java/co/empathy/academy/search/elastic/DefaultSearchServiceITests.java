@@ -42,7 +42,7 @@ public class DefaultSearchServiceITests {
         mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "Camisa"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.query").value("Camisa"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.clusterName").value("docker-cluster"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.clusterName").value("elasticsearch"));
     }
 
     @Test
