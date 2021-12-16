@@ -1,48 +1,11 @@
 package co.empathy.academy.search;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import co.empathy.academy.search.elastic.DefaultSearchServiceITests;
+import org.junit.platform.suite.api.SelectClasses;
+import org.junit.platform.suite.api.Suite;
 
-import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
-@SpringBootTest
-@AutoConfigureMockMvc
+@Suite
+@SelectClasses( DefaultSearchServiceITests.class )
 class AcademySearchApplicationTests {
-
-	@Autowired
-	private MockMvc mvc;
-
-	@Test
-	void searchReturnsQueryAndClusterName() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "Camisa"))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.query").value("Camisa"))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.clusterName").value("docker-cluster"));
-	}
-
-	@Test
-	void searchBadRequestWithoutQuery() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search"))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest());
-	}
-
-	@Test
-	void searchEmptyQueryBadRequest() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", ""))
-				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
-				.andExpect(MockMvcResultMatchers.status().isBadRequest());
-		mvc.perform(MockMvcRequestBuilders.get("/search").param("query", " 	 "))
-				.andExpect(MockMvcResultMatchers.status().is4xxClientError())
-				.andExpect(MockMvcResultMatchers.status().isBadRequest());
-	}
 
 }
