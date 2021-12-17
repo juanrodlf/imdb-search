@@ -6,13 +6,13 @@ Mock project for Empathy Academy - Search Path
 <br />
 <div align="center">
   <a href="https://github.com/uo271773/imdb-search">
-    <img src="images/cinema.png" alt="Logo" width="80" height="80">
+    <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Search IMDb</h3>
 
   <p align="center">
-    Busca tus películas favoritas y obtén información sobre ellas. Basado en la API de IMDb
+    Search for your favourite films and see information about them. <br />Based on IMDb API
     <br />
     <a href="https://github.com/uo271773/imdb-search/issues">Report Bug</a>
     ·
