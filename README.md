@@ -123,5 +123,3 @@ Project Link: [https://github.com/uo271773/imdb-search](https://github.com/uo271
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-<p align="right">(<a href="#top">back to top</a>)</p>
