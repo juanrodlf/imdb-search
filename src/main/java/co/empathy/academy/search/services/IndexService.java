@@ -1,11 +1,11 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.Title;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.collections4.ListUtils;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RestClient;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,41 +14,43 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @Service
 public class IndexService {
 
     private final ObjectMapper mapper;
-    private final RestClient restClient;
+    private final RestHighLevelClient client;
 
     @Autowired
-    public IndexService(RestClient restClient) {
+    public IndexService(RestHighLevelClient client) {
         this.mapper = new ObjectMapper();
-        this.restClient = restClient;
+        this.client = client;
     }
 
     public void indexFromTsv(String path) throws IOException {
         Path pathObject = Paths.get(path);
         List<String> lines = Files.readAllLines(pathObject);
-        List<String> titlesList = new ArrayList<>();
+        List<Title> titlesList = new ArrayList<>();
         for (int i = 1; i < lines.size(); i++) {
-            titlesList.add(serialize(parseTitle(lines.get(i))));
+            titlesList.add(parseTitle(lines.get(i)));
         }
-        List<List<String>> batches = ListUtils.partition(titlesList, 1000);
-        batches.parallelStream().forEach(batch -> {
-            try {
-                String json = batch.parallelStream().collect(Collectors.joining("\n")) + "\n";
-                Request req = new Request("POST", "/_bulk");
-                req.setJsonEntity(json);
-                restClient.performRequest(req);
-            }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
+        BulkRequest bulk = new BulkRequest();
 
-        });
+        Map<String, Object> jsonMap = new HashMap<>();
+        for (Title title : titlesList) {
+            jsonMap.clear();
+            jsonMap.put("titleType", title.titleType());
+            jsonMap.put("primaryTitle", title.primaryTitle());
+            jsonMap.put("originalTitle", title.originalTitle());
+            jsonMap.put("isAdult", title.isAdult());
+            jsonMap.put("startYear", title.startYear());
+            jsonMap.put("endYear", title.endYear());
+            bulk.add(new IndexRequest("imdb").id(title.tConst()).source(jsonMap));
+            client.bulk(bulk, RequestOptions.DEFAULT);
+        }
     }
 
     private Title parseTitle(String line) {
@@ -80,34 +82,5 @@ public class IndexService {
     private List<String> genresToList (String str) {
         return str.equals("\\N") ? List.of() : List.of(str.split(","));
     }
-
-    private String serialize(Title title) {
-        Index index = new Index("imdb", title.tConst());
-        TitleToIndex titleToIndex = new TitleToIndex(title.titleType(),
-                title.primaryTitle(),
-                title.originalTitle(),
-                title.isAdult(),
-                title.startYear(),
-                title.endYear(),
-                title.runtimeMinutes(),
-                title.genres());
-        try {
-            String iSe = mapper.writeValueAsString(index);
-            String titleToIndexSe = mapper.writeValueAsString(titleToIndex);
-            return "{\"index\":" + iSe + "}\n" + titleToIndexSe;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    record Index(String _index, String _id) {}
-    record TitleToIndex(String titleType,
-                        String primaryTitle,
-                        String originalTitle,
-                        Boolean isAdult,
-                        Integer startYear,
-                        Integer endYear,
-                        Integer runtimeMinutes,
-                        List<String> genres) {}
 
 }
