@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Service
 public class IndexService {
@@ -35,23 +36,20 @@ public class IndexService {
 
     public void indexFromTsv(String path) throws IOException, InterruptedException {
         Path pathObject = Paths.get(path);
-        List<String> lines = Files.readAllLines(pathObject);
+        Stream<String> lines = Files.lines(pathObject);
 
         BulkRequest bulk = new BulkRequest();
-        lines.stream().skip(1).forEach(line -> {
-            Title title = parseTitle(line);
-            IndexRequest indexRequest = buildRequest(title);
-            bulk.add(indexRequest);
-        });
+        lines.skip(1).forEach(line ->
+            bulk.add(buildRequest(parseTitle(line)))
+        );
         client.bulk(bulk, RequestOptions.DEFAULT);
     }
 
     private IndexRequest buildRequest(Title title) {
         String serialized = Title.getAsString(title);
-        IndexRequest request = new IndexRequest("imdb");
-        request.id(title.tConst());
-        request.source(serialized, XContentType.JSON);
-        return request;
+        return new IndexRequest("imdb")
+                                            .id(title.tConst())
+                                            .source(serialized, XContentType.JSON);
     }
 
     private Title parseTitle(String line) {
