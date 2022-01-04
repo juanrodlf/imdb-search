@@ -1,4 +1,8 @@
 package co.empathy.academy.search.responses;
 
-public record SearchDtoResponse(String query, String clusterName) {
+import org.elasticsearch.search.SearchHit;
+
+import java.util.List;
+
+public record SearchDtoResponse(List<String> result) {
 }

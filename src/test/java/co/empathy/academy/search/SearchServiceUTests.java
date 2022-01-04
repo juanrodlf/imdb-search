@@ -21,14 +21,17 @@ public class SearchServiceUTests {
     public void init() {
         MockitoAnnotations.openMocks(this);
     }
-
+/*
     @Test
     public void getQueryTest() {
         String query = "Camisa roja";
         when(service.getQuery(query)).thenReturn(query);
-        String queryGet = service.getQuery(query);
-        assertEquals(queryGet, query);
+        //String queryGet = service.getQuery(query);
+        //assertEquals(queryGet, query);
+        //TODO
     }
+
+ */
 
     @Test
     public void getClusterNameTest() {

@@ -21,10 +21,7 @@ public class IndexController {
             service.indexFromTsv(path);
             return ResponseEntity.ok().build();
         }
-        catch (IOException ex) {
-            return ResponseEntity.badRequest().build();
-        }
-        catch (InterruptedException ex) {
+        catch (IOException | InterruptedException ex) {
             return ResponseEntity.badRequest().build();
         }
     }
