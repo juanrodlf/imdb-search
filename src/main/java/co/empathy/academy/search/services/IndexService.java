@@ -1,33 +1,31 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.Title;
-import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.ByteSizeUnit;
-import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 @Service
 public class IndexService {
 
     private final RestHighLevelClient client;
     Logger logger = LoggerFactory.getLogger(IndexService.class);
+    private ObjectMapper mapper;
 
     @Autowired
     public IndexService(RestHighLevelClient client) {
@@ -36,34 +34,41 @@ public class IndexService {
 
     public void indexFromTsv(String path) throws IOException, InterruptedException {
         Path pathObject = Paths.get(path);
-        Stream<String> lines = Files.lines(pathObject);
+        List<String> lines = Files.readAllLines(pathObject);
 
         BulkRequest bulk = new BulkRequest();
-        lines.skip(1).forEach(line ->
-            bulk.add(buildRequest(parseTitle(line)))
-        );
+        long start = System.currentTimeMillis();
+
+        for (int i = 1; i < lines.size(); i++) {
+            if (i % 100000 == 0) {
+                client.bulk(bulk, RequestOptions.DEFAULT);
+                bulk = new BulkRequest();
+            }
+            bulk.add(buildRequest(lines.get(i)));
+        }
         client.bulk(bulk, RequestOptions.DEFAULT);
+        logger.info("Bulk process finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
     }
 
-    private IndexRequest buildRequest(Title title) {
-        String serialized = Title.getAsString(title);
-        return new IndexRequest("imdb")
-                                            .id(title.tConst())
-                                            .source(serialized, XContentType.JSON);
+    private IndexRequest buildRequest(String title) {
+        Map<String, Object> serialized = parseTitle(title);
+        return new IndexRequest("imdb").id((String) serialized.get("tConst"))
+                .source(serialized);
     }
 
-    private Title parseTitle(String line) {
+    private Map<String, Object> parseTitle(String line) {
+        Map<String, Object> map = new HashMap<>();
         String[] values = line.split("\t");
-        String tConst = validateStr(values[0]);
-        String titleType = validateStr(values[1]);
-        String primaryTitle = validateStr(values[2]);
-        String originalTitle = validateStr(values[3]);
-        Boolean isAdult = validateBool(values[4]);
-        Integer startYear = validateInt(values[5]);
-        Integer endYear = validateInt(values[6]);
-        Integer runtimeMinutes = validateInt(values[7]);
-        List<String> genres = genresToList(values[8]);
-        return new Title(tConst, titleType, primaryTitle, originalTitle, isAdult, startYear, endYear, runtimeMinutes, genres);
+        map.put("tConst", validateStr(values[0]));
+        map.put("titleType", validateStr(values[1]));
+        map.put("primaryTitle", validateStr(values[2]));
+        map.put("originalTitle", validateStr(values[3]));
+        map.put("isAdult", validateBool(values[4]));
+        map.put("startYear", validateInt(values[5]));
+        map.put("endYear", validateInt(values[6]));
+        map.put("runtimeMinutes", validateInt(values[7]));
+        map.put("genres", genresToList(values[8]));
+        return map;
     }
 
     private String validateStr(String str) {
