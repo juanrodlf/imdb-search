@@ -15,7 +15,6 @@
 	<description>Spring Boot project for Academy Search Path at Empathy co.</description>
 	<properties>
 		<java.version>17</java.version>
-		<elasticsearch.version>7.1.1</elasticsearch.version>
 	</properties>
 
 	<dependencies>
@@ -31,32 +30,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
-			<version>3.1.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>co.elastic.clients</groupId>
-			<artifactId>elasticsearch-java</artifactId>
-			<version>7.16.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.elasticsearch.client</groupId>
 			<artifactId>elasticsearch-rest-high-level-client</artifactId>
-			<version>7.16.2</version>
+			<version>7.15.2</version>
 		</dependency>
 
 		<dependency>
@@ -77,12 +59,6 @@
 			<artifactId>elasticsearch</artifactId>
 			<version>1.16.2</version>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-elasticsearch</artifactId>
-			<version>4.3.0</version>
 		</dependency>
 
 		<dependency>

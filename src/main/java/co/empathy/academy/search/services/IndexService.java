@@ -1,11 +1,17 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.model.Title;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,44 +19,39 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
 public class IndexService {
 
-    private final ObjectMapper mapper;
     private final RestHighLevelClient client;
+    Logger logger = LoggerFactory.getLogger(IndexService.class);
 
     @Autowired
     public IndexService(RestHighLevelClient client) {
-        this.mapper = new ObjectMapper();
         this.client = client;
     }
 
-    public void indexFromTsv(String path) throws IOException {
+    public void indexFromTsv(String path) throws IOException, InterruptedException {
         Path pathObject = Paths.get(path);
         List<String> lines = Files.readAllLines(pathObject);
-        List<Title> titlesList = new ArrayList<>();
-        for (int i = 1; i < lines.size(); i++) {
-            titlesList.add(parseTitle(lines.get(i)));
-        }
-        BulkRequest bulk = new BulkRequest();
 
-        Map<String, Object> jsonMap = new HashMap<>();
-        for (Title title : titlesList) {
-            jsonMap.clear();
-            jsonMap.put("titleType", title.titleType());
-            jsonMap.put("primaryTitle", title.primaryTitle());
-            jsonMap.put("originalTitle", title.originalTitle());
-            jsonMap.put("isAdult", title.isAdult());
-            jsonMap.put("startYear", title.startYear());
-            jsonMap.put("endYear", title.endYear());
-            bulk.add(new IndexRequest("imdb").id(title.tConst()).source(jsonMap));
-            client.bulk(bulk, RequestOptions.DEFAULT);
-        }
+        BulkRequest bulk = new BulkRequest();
+        lines.stream().skip(1).forEach(line -> {
+            Title title = parseTitle(line);
+            IndexRequest indexRequest = buildRequest(title);
+            bulk.add(indexRequest);
+        });
+        client.bulk(bulk, RequestOptions.DEFAULT);
+    }
+
+    private IndexRequest buildRequest(Title title) {
+        String serialized = Title.getAsString(title);
+        IndexRequest request = new IndexRequest("imdb");
+        request.id(title.tConst());
+        request.source(serialized, XContentType.JSON);
+        return request;
     }
 
     private Title parseTitle(String line) {

@@ -1,6 +1,11 @@
 package co.empathy.academy.search.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
+import java.util.Map;
 
 public record Title(String tConst,
                     String titleType,
@@ -11,4 +16,13 @@ public record Title(String tConst,
                     Integer endYear,
                     Integer runtimeMinutes,
                     List<String> genres) {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    public static String getAsString(Title title) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(title);
+        } catch(JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }
