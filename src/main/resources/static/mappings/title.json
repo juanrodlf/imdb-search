@@ -1,0 +1,31 @@
+{
+  "properties": {
+    "tConst": {
+      "type": "keyword"
+    },
+    "titleType": {
+      "type": "text"
+    },
+    "primaryTitle": {
+      "type": "text"
+    },
+    "originalTitle": {
+      "type": "text"
+    },
+    "isAdult": {
+      "type": "boolean"
+    },
+    "startYear": {
+      "type": "long"
+    },
+    "endYear": {
+      "type": "long"
+    },
+    "runtimeMinutes": {
+      "type": "long"
+    },
+    "genres": {
+      "type": "text"
+    }
+  }
+}

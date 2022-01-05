@@ -1,9 +1,13 @@
 package co.empathy.academy.search.services;
 
+import co.empathy.academy.search.helpers.Util;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.common.recycler.Recycler;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,7 @@ public class IndexService {
     }
 
     public void indexFromTsv(String path) throws IOException, InterruptedException {
+        createIndex();
         Path pathObject = Paths.get(path);
         List<String> lines = Files.readAllLines(pathObject);
 
@@ -46,6 +51,24 @@ public class IndexService {
         }
         client.bulk(bulk, RequestOptions.DEFAULT);
         logger.info("Bulk process finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
+    }
+
+    private void createIndex() {
+        String settings = Util.loadAsString("static/es-settings.json");
+        String mapping = Util.loadAsString("static/mappings/title.json");
+        try {
+            if (settings == null || mapping == null) {
+                logger.error("Failed to create index.");
+                return;
+            }
+            CreateIndexRequest createIndexRequest = new CreateIndexRequest("title");
+            createIndexRequest.settings(settings,XContentType.JSON);
+            createIndexRequest.mapping(mapping, XContentType.JSON);
+
+            client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+        } catch(IOException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
     }
 
     private IndexRequest buildRequest(String title) {
