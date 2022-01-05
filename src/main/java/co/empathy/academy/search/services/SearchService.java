@@ -1,6 +1,7 @@
 package co.empathy.academy.search.services;
 
 import co.empathy.academy.search.controllers.cluster.ClusterNotFoundException;
+import co.empathy.academy.search.responses.SearchDtoResponse;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -16,9 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SearchService {
@@ -26,7 +25,7 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    public List<String> getQuery(String query) {
+    public SearchDtoResponse getQuery(String query) {
         if (query.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "The query cannot be empty.");
@@ -39,12 +38,14 @@ public class SearchService {
         try {
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
             SearchHits hits = response.getHits();
-            List<SearchHit> searchHits = Arrays.asList(hits.getHits());
-            List<String> titles = new ArrayList<>();
+            List<SearchHit> searchHits = List.of(hits.getHits());
+            List<Map<String, Object>> titles = new ArrayList<>();
             for (SearchHit sh : searchHits) {
-                titles.add(sh.getSourceAsString());
+                titles.add(sh.getSourceAsMap());
             }
-            return titles;
+            long total = hits.getTotalHits().value;
+            SearchDtoResponse dtoResponse = new SearchDtoResponse(total, titles);
+            return dtoResponse;
         } catch(IOException ex) {
             throw new RuntimeException(ex);
         }

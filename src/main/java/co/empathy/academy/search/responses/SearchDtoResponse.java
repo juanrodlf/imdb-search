@@ -1,8 +1,7 @@
 package co.empathy.academy.search.responses;
 
-import org.elasticsearch.search.SearchHit;
-
 import java.util.List;
+import java.util.Map;
 
-public record SearchDtoResponse(List<String> result) {
+public record SearchDtoResponse(long total, List<Map<String, Object>> items) {
 }
