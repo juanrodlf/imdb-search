@@ -26,6 +26,8 @@
     },
     "genres": {
       "type": "text"
-    }
+    },
+    "search_analyzer": "title_search_analyzer",
+    "analyzer":"title_search_analyzer"
   }
 }

@@ -6,13 +6,12 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.common.recycler.Recycler;
+import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +26,6 @@ public class IndexService {
 
     private final RestHighLevelClient client;
     Logger logger = LoggerFactory.getLogger(IndexService.class);
-    private ObjectMapper mapper;
 
     @Autowired
     public IndexService(RestHighLevelClient client) {
@@ -65,7 +63,10 @@ public class IndexService {
             createIndexRequest.settings(settings,XContentType.JSON);
             createIndexRequest.mapping(mapping, XContentType.JSON);
 
-            client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            GetIndexRequest getIndexRequest = new GetIndexRequest("title");
+            if (!client.indices().exists(getIndexRequest, RequestOptions.DEFAULT)) {
+                client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
+            }
         } catch(IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
