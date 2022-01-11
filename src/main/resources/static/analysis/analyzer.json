@@ -1,0 +1,28 @@
+{
+  "settings" : {
+    "analysis": {
+      "analyzer": {
+        "title_search_analyzer": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["asciifolding","lowercase", "stemmer", "synonym_filter"],
+          "char-filters": ["eliminate_hyphen_filter"]
+        }
+      }
+    },
+    "char_filter": {
+      "eliminate_hyphen_filter": {
+        "type": "pattern_replace",
+        "pattern": "-",
+        "replacement": ""
+      }
+    },
+    "filter": {
+      "synonym_filter": {
+        "type": "synonym",
+        "synonyms_path": "analysis/synonyms.txt"
+      }
+    }
+  }
+
+}

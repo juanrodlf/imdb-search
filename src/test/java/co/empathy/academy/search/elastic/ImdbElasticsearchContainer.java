@@ -4,7 +4,7 @@ import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 public class ImdbElasticsearchContainer extends ElasticsearchContainer {
 
-    private static final String ELASTIC_SEARCH_DOCKER = "elasticsearch:7.11.1";
+    private static final String ELASTIC_SEARCH_DOCKER = "docker.elastic.co/elasticsearch/elasticsearch:7.16.1";
     private static final String CLUSTER_NAME = "cluster.name";
     private static final String ELASTIC_SEARCH = "elasticsearch";
 

@@ -3,6 +3,7 @@ package co.empathy.academy.search.services;
 import co.empathy.academy.search.helpers.Util;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
@@ -47,28 +48,22 @@ public class IndexService {
             }
             bulk.add(buildRequest(lines.get(i)));
         }
-        client.bulk(bulk, RequestOptions.DEFAULT);
+        if (!bulk.getIndices().isEmpty()) {
+            client.bulk(bulk, RequestOptions.DEFAULT);
+        }
         logger.info("Bulk process finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
     }
 
     private void createIndex() {
-        String settings = Util.loadAsString("static/es-settings.json");
+        String settings = Util.loadAsString("static/analysis/analyzer.json");
         String mapping = Util.loadAsString("static/mappings/title.json");
         try {
-            if (settings == null || mapping == null) {
-                logger.error("Failed to create index.");
-                return;
-            }
-            CreateIndexRequest createIndexRequest = new CreateIndexRequest("title");
-            createIndexRequest.settings(settings,XContentType.JSON);
-            createIndexRequest.mapping(mapping, XContentType.JSON);
-
-            GetIndexRequest getIndexRequest = new GetIndexRequest("title");
-            if (!client.indices().exists(getIndexRequest, RequestOptions.DEFAULT)) {
-                client.indices().create(createIndexRequest, RequestOptions.DEFAULT);
-            }
+            Request request = new Request("PUT", "/imdb");
+            request.setJsonEntity(settings);
+            request.setJsonEntity(mapping);
+            client.getLowLevelClient().performRequest(request);
         } catch(IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getMessage());
         }
     }
 
