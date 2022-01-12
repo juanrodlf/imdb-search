@@ -39,7 +39,6 @@ public class IndexService {
         BulkRequest bulk = new BulkRequest();
         bulk.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
         long start = System.currentTimeMillis();
-        logger.info(String.valueOf(lines.size()));
         for (int i = 1; i < lines.size(); i++) {
             if (i % 100000 == 0) {
                 client.bulk(bulk, RequestOptions.DEFAULT);

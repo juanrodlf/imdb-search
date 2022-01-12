@@ -1,33 +1,34 @@
 {
-  "properties": {
-    "tConst": {
-      "type": "keyword"
-    },
-    "titleType": {
-      "type": "text"
-    },
-    "primaryTitle": {
-      "type": "text"
-    },
-    "originalTitle": {
-      "type": "text"
-    },
-    "isAdult": {
-      "type": "boolean"
-    },
-    "startYear": {
-      "type": "long"
-    },
-    "endYear": {
-      "type": "long"
-    },
-    "runtimeMinutes": {
-      "type": "long"
-    },
-    "genres": {
-      "type": "text"
-    },
-    "search_analyzer": "title_search_analyzer",
-    "analyzer":"title_search_analyzer"
+  "mappings" : {
+    "properties": {
+      "tConst": {
+        "type": "keyword"
+      },
+      "titleType": {
+        "type": "text"
+      },
+      "primaryTitle": {
+        "type": "text",
+        "analyzer": "title_search_analyzer"
+      },
+      "originalTitle": {
+        "type": "text"
+      },
+      "isAdult": {
+        "type": "boolean"
+      },
+      "startYear": {
+        "type": "long"
+      },
+      "endYear": {
+        "type": "long"
+      },
+      "runtimeMinutes": {
+        "type": "long"
+      },
+      "genres": {
+        "type": "text"
+      }
+    }
   }
 }

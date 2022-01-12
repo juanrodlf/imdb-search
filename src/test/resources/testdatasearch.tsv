@@ -1,0 +1,6 @@
+tconst	titleType	primaryTitle	originalTitle	isAdult	startYear	endYear	runtimeMinutes	genres
+tt0145487	movie	Spider-Man	Spider-Man	0	2002	\N	121	Action,Adventure,Sci-Fi
+tt0964012	tvEpisode	Spiderman	Spiderman	0	2000	\N	\N	Crime,Documentary,Mystery
+tt0076759	movie	Star Wars: Episode IV - A New Hope	Star Wars	0	1977	\N	121	Action,Adventure,Fantasy
+tt0084340	movie	Les Misérables	Les misérables	0	1982	\N	220	Drama
+tt0816692	movie	Interstellar	Interstellar	0	2014	\N	169	Adventure,Drama,Sci-Fi

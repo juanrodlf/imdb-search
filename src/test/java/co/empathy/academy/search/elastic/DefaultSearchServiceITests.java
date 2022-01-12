@@ -14,21 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DefaultSearchServiceITests {
 
     @Container
-    protected static final ElasticsearchContainer elasticsearchContainer = new ImdbElasticsearchContainer();
+    protected static final ElasticsearchContainer ELASTICSEARCH_CONTAINER = new ImdbElasticsearchContainer();
 
     @BeforeAll
     static void setUp() {
-        elasticsearchContainer.start();
-    }
-
-    @BeforeEach
-    void testContainerRunning() {
-        assertTrue(elasticsearchContainer.isRunning());
+        ELASTICSEARCH_CONTAINER.start();
     }
 
     @AfterAll
     static void destroy() {
-        elasticsearchContainer.stop();
+        ELASTICSEARCH_CONTAINER.stop();
     }
 
     @Test
