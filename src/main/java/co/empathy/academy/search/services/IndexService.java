@@ -3,12 +3,10 @@ package co.empathy.academy.search.services;
 import co.empathy.academy.search.helpers.Util;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.GetIndexRequest;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +37,19 @@ public class IndexService {
         List<String> lines = Files.readAllLines(pathObject);
 
         BulkRequest bulk = new BulkRequest();
+        bulk.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
         long start = System.currentTimeMillis();
-
+        logger.info(String.valueOf(lines.size()));
         for (int i = 1; i < lines.size(); i++) {
             if (i % 100000 == 0) {
                 client.bulk(bulk, RequestOptions.DEFAULT);
                 bulk = new BulkRequest();
+                bulk.setRefreshPolicy(WriteRequest.RefreshPolicy.WAIT_UNTIL);
             }
             bulk.add(buildRequest(lines.get(i)));
         }
-        if (!bulk.getIndices().isEmpty()) {
-            client.bulk(bulk, RequestOptions.DEFAULT);
-        }
+        client.bulk(bulk, RequestOptions.DEFAULT);
+
         logger.info("Bulk process finished in {} seconds", (System.currentTimeMillis() - start) / 1000);
     }
 
