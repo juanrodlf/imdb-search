@@ -29,7 +29,7 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    public SearchDtoResponse getQuery(String searchText, String genres) {
+    public SearchDtoResponse getQuery(String searchText, String genres, String types) {
         if (searchText.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "The query cannot be empty.");
@@ -37,7 +37,7 @@ public class SearchService {
         SearchRequest request = new SearchRequest("imdb");
 
         SearchSourceBuilder requestBuilder = new SearchSourceBuilder();
-        requestBuilder.query(buildQuery(searchText, genres));
+        requestBuilder.query(buildQuery(searchText, genres, types));
         request.source(requestBuilder);
         try {
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
@@ -54,13 +54,19 @@ public class SearchService {
         }
     }
 
-    private QueryBuilder buildQuery(String searchText, String genres) {
+    private QueryBuilder buildQuery(String searchText, String genres, String types) {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         queryBuilder.must(QueryBuilders.matchQuery("primaryTitle", searchText));
         if (genres != null) {
             String[] genresSplit = genres.split(",");
-            for (String s : genresSplit) {
-                queryBuilder.must(QueryBuilders.matchQuery("genres", s));
+            for (String genre : genresSplit) {
+                queryBuilder.must(QueryBuilders.matchQuery("genres", genre));
+            }
+        }
+        if (types != null) {
+            String[] typesSplit = types.split(",");
+            for (String type : typesSplit) {
+                queryBuilder.must(QueryBuilders.matchQuery("titleType", type));
             }
         }
         return queryBuilder;
