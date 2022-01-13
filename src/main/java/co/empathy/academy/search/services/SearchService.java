@@ -13,6 +13,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,9 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    public SearchDtoResponse getQuery(String searchText, String genres, String types) {
+    Logger logger = LoggerFactory.getLogger(SearchService.class);
+
+    public SearchDtoResponse getQuery(String searchText, String genres, String types, String ranges) {
         if (searchText.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "The query cannot be empty.");
@@ -37,7 +41,7 @@ public class SearchService {
         SearchRequest request = new SearchRequest("imdb");
 
         SearchSourceBuilder requestBuilder = new SearchSourceBuilder();
-        requestBuilder.query(buildQuery(searchText, genres, types));
+        requestBuilder.query(buildQuery(searchText, genres, types, ranges));
         request.source(requestBuilder);
         try {
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
@@ -54,7 +58,7 @@ public class SearchService {
         }
     }
 
-    private QueryBuilder buildQuery(String searchText, String genres, String types) {
+    private QueryBuilder buildQuery(String searchText, String genres, String types, String ranges) {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         queryBuilder.must(QueryBuilders.matchQuery("primaryTitle", searchText));
         if (genres != null) {
@@ -65,9 +69,26 @@ public class SearchService {
         }
         if (types != null) {
             String[] typesSplit = types.split(",");
+            BoolQueryBuilder typesQuery = QueryBuilders.boolQuery();
             for (String type : typesSplit) {
-                queryBuilder.must(QueryBuilders.matchQuery("titleType", type));
+                typesQuery.should(QueryBuilders.matchQuery("titleType", type));
             }
+            queryBuilder.must(typesQuery);
+        }
+        if (ranges != null) {
+            String[] rangesSplit = ranges.split(",");
+            BoolQueryBuilder rangeQueries = QueryBuilders.boolQuery();
+            for (String range : rangesSplit) {
+                String[] years = range.split("/");
+                if (years.length != 2) {
+                    logger.info("Range \"{}\" not defined properly (Format: YYYY/YYYY)", range);
+                    continue;
+                }
+                int startYear = Integer.parseInt(years[0]);
+                int endYear = Integer.parseInt(years[1]);
+                rangeQueries.should(QueryBuilders.rangeQuery("startYear").gte(startYear).lte(endYear));
+            }
+            queryBuilder.must(rangeQueries);
         }
         return queryBuilder;
     }
