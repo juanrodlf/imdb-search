@@ -54,11 +54,9 @@ public class IndexService {
 
     private void createIndex() {
         String settings = Util.loadAsString("static/analysis/analyzer.json");
-        String mapping = Util.loadAsString("static/mappings/title.json");
         try {
             Request request = new Request("PUT", "/imdb");
             request.setJsonEntity(settings);
-            request.setJsonEntity(mapping);
             client.getLowLevelClient().performRequest(request);
         } catch(IOException ex) {
             logger.error(ex.getMessage());

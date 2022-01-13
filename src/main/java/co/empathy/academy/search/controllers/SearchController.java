@@ -15,8 +15,9 @@ public class SearchController {
     private SearchService searchService;
 
     @GetMapping("/search")
-    public SearchDtoResponse search(@RequestParam String query) {
-        return searchService.getQuery(query);
+    public SearchDtoResponse search(@RequestParam String query,
+                                    @RequestParam(required = false) String genre) {
+        return searchService.getQuery(query, genre);
     }
 
 }

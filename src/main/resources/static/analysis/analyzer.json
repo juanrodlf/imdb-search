@@ -1,12 +1,45 @@
 {
+  "mappings" : {
+    "properties": {
+      "tConst": {
+        "type": "keyword"
+      },
+      "titleType": {
+        "type": "text"
+      },
+      "primaryTitle": {
+        "type": "text",
+        "analyzer": "title_search_analyzer"
+      },
+      "originalTitle": {
+        "type": "text"
+      },
+      "isAdult": {
+        "type": "boolean"
+      },
+      "startYear": {
+        "type": "long"
+      },
+      "endYear": {
+        "type": "long"
+      },
+      "runtimeMinutes": {
+        "type": "long"
+      },
+      "genres": {
+        "type": "text",
+        "fielddata": true
+      }
+    }
+  },
   "settings" : {
     "analysis": {
       "analyzer": {
         "title_search_analyzer": {
           "type": "custom",
-          "tokenizer": "standard",
-          "filter": ["asciifolding","lowercase", "stemmer", "synonym_filter", "custom_word_delimiter"],
-          "char-filters": ["html_strip"]
+          "tokenizer": "whitespace",
+          "filter": ["asciifolding","lowercase", "flatten_graph", "synonym_filter", "custom_word_delimiter", "trim"],
+          "char-filter": ["html_strip"]
         }
       }
     },
@@ -21,5 +54,4 @@
       }
     }
   }
-
 }

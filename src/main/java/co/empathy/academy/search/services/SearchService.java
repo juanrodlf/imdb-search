@@ -7,6 +7,8 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class SearchService {
@@ -25,15 +29,15 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    public SearchDtoResponse getQuery(String query) {
-        if (query.trim().isEmpty()) {
+    public SearchDtoResponse getQuery(String searchText, String genres) {
+        if (searchText.trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "The query cannot be empty.");
         }
         SearchRequest request = new SearchRequest("imdb");
 
         SearchSourceBuilder requestBuilder = new SearchSourceBuilder();
-        requestBuilder.query(QueryBuilders.matchQuery("primaryTitle", query));
+        requestBuilder.query(buildQuery(searchText, genres));
         request.source(requestBuilder);
         try {
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
@@ -44,11 +48,22 @@ public class SearchService {
                 titles.add(sh.getSourceAsMap());
             }
             long total = hits.getTotalHits().value;
-            SearchDtoResponse dtoResponse = new SearchDtoResponse(total, titles);
-            return dtoResponse;
+            return new SearchDtoResponse(total, titles);
         } catch(IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private QueryBuilder buildQuery(String searchText, String genres) {
+        BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+        queryBuilder.must(QueryBuilders.matchQuery("primaryTitle", searchText));
+        if (genres != null) {
+            String[] genresSplit = genres.split(",");
+            for (String s : genresSplit) {
+                queryBuilder.must(QueryBuilders.matchQuery("genres", s));
+            }
+        }
+        return queryBuilder;
     }
 
     public String getClusterName() {
