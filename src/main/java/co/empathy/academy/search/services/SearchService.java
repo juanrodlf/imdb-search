@@ -12,6 +12,9 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SearchService {
@@ -42,9 +43,11 @@ public class SearchService {
 
         SearchSourceBuilder requestBuilder = new SearchSourceBuilder();
         requestBuilder.query(buildQuery(searchText, genres, types, ranges));
+        addAggregations(requestBuilder);
         request.source(requestBuilder);
         try {
             SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+
             SearchHits hits = response.getHits();
             List<SearchHit> searchHits = List.of(hits.getHits());
             List<Map<String, Object>> titles = new ArrayList<>();
@@ -52,10 +55,21 @@ public class SearchService {
                 titles.add(sh.getSourceAsMap());
             }
             long total = hits.getTotalHits().value;
-            return new SearchDtoResponse(total, titles);
+
+            Terms genresTerms = response.getAggregations().get("genres");
+            Map<String, Long> genresToDto = new HashMap<>();
+            for (Terms.Bucket bucket : genresTerms.getBuckets()) {
+                genresToDto.put(bucket.getKeyAsString(), bucket.getDocCount());
+            }
+
+            return new SearchDtoResponse(total, titles, genresToDto);
         } catch(IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private void addAggregations(SearchSourceBuilder requestBuilder) {
+        requestBuilder.aggregation(AggregationBuilders.terms("genres").field("genres.keyword"));
     }
 
     private QueryBuilder buildQuery(String searchText, String genres, String types, String ranges) {
