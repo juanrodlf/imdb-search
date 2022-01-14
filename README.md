@@ -107,11 +107,132 @@ Install Docker, Elasticsearch and Maven
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-For now, there is only available a functionality which returns a query the user writes and the name of the container. Try it writing "localhost:8080/search?query=ThingToSearch"
-or with the command:
+###Request
+
+The endpoint `/search` is used to search and filter a title.
+Mandatory parameter:
+* `query`: It is the primary title of the title to be searched.
+
+Optional parameters:
+* `type`: Filters result by types, they can be separated by a comma.
+If there are more than one, results will include titles with at least
+one of the specified types.
+* `genres`: Filters result by genres, they can be separated by a comma.
+If there are more than one, results will include titles with 
+at least one of the specified genres.
+* `year`: Filters by ranges of years, they can be separated by a comma.
+Format is YYYY/YYYY,YYYY/YYYY,etc. If there are more than one range,
+results will include all of them. 
+
+Example:
   ```sh
-   curl localhost:8080/search?query=ThingToSearch
+   curl "localhost:8080/search?query=spiderman&genre=action&type=movie,tvEpisode&year=2000/2001,2008/2015"
    ```
+This query would search all the titles containing 'spiderman' on 
+primary title, filtered by genre 'action' AND type 'movie' OR 'tvEpisode',
+included on ranges '2000-2001' (both included) OR '2008-2015'
+(both included)
+
+###Response
+
+The response is a json object which contains the following fields:
+* `total`: Total number of results for the query.
+* `items`: A list containing the first 10 titles retrieved.
+* `aggregations`: Total results depending on fields:
+  * `genres`: Number of results of each gender for the query.
+  * `types`: Number of results depending on each type for the query.
+  * `ranges`: Number of results for each decade from year 1900.
+
+Example of response for previous query:
+
+```{toggle}
+{
+   "aggregations" : {
+      "genres" : {
+         "Action" : 4,
+         "Adventure" : 2,
+         "Comedy" : 2
+      },
+      "ranges" : {
+         "1900.0-1910.0" : 0,
+         "1910.0-1920.0" : 0,
+         "1920.0-1930.0" : 0,
+         "1930.0-1940.0" : 0,
+         "1940.0-1950.0" : 0,
+         "1950.0-1960.0" : 0,
+         "1960.0-1970.0" : 0,
+         "1970.0-1980.0" : 0,
+         "1980.0-1990.0" : 0,
+         "1990.0-2000.0" : 0,
+         "2000.0-2010.0" : 0,
+         "2010.0-2020.0" : 4
+      },
+      "types" : {
+         "tvEpisode" : 4
+      }
+   },
+   "items" : [
+      {
+         "endYear" : null,
+         "genres" : [
+            "Action"
+         ],
+         "isAdult" : false,
+         "originalTitle" : "Spiderman 2011",
+         "primaryTitle" : "Spiderman 2011",
+         "runtimeMinutes" : null,
+         "startYear" : 2012,
+         "tConst" : "tt4198962",
+         "titleType" : "tvEpisode"
+      },
+      {
+         "endYear" : null,
+         "genres" : [
+            "Action"
+         ],
+         "isAdult" : false,
+         "originalTitle" : "Gentleman Spiderman",
+         "primaryTitle" : "Gentleman Spiderman",
+         "runtimeMinutes" : null,
+         "startYear" : 2013,
+         "tConst" : "tt4199102",
+         "titleType" : "tvEpisode"
+      },
+      {
+         "endYear" : null,
+         "genres" : [
+            "Action",
+            "Adventure",
+            "Comedy"
+         ],
+         "isAdult" : false,
+         "originalTitle" : "Honest Review: Spiderman 1 & 2",
+         "primaryTitle" : "Honest Review: Spiderman 1 & 2",
+         "runtimeMinutes" : 9,
+         "startYear" : 2012,
+         "tConst" : "tt2384655",
+         "titleType" : "tvEpisode"
+      },
+      {
+         "endYear" : null,
+         "genres" : [
+            "Action",
+            "Adventure",
+            "Comedy"
+         ],
+         "isAdult" : false,
+         "originalTitle" : "Top 10 Un-Amazing Spiderman 2 Moments",
+         "primaryTitle" : "Top 10 Un-Amazing Spiderman 2 Moments",
+         "runtimeMinutes" : 26,
+         "startYear" : 2014,
+         "tConst" : "tt4143124",
+         "titleType" : "tvEpisode"
+      }
+   ],
+   "total" : 4
+}
+```
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- CONTACT -->
