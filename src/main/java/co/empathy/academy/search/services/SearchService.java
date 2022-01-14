@@ -13,7 +13,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
@@ -56,20 +55,28 @@ public class SearchService {
             }
             long total = hits.getTotalHits().value;
 
-            Terms genresTerms = response.getAggregations().get("genres");
-            Map<String, Long> genresToDto = new HashMap<>();
-            for (Terms.Bucket bucket : genresTerms.getBuckets()) {
-                genresToDto.put(bucket.getKeyAsString(), bucket.getDocCount());
-            }
+            Map<String, Map<String, Long>> termsAggList = new HashMap<>();
+            termsAggList.put("genres", getTermAggregation("genres", response));
+            termsAggList.put("types", getTermAggregation("type", response));
 
-            return new SearchDtoResponse(total, titles, genresToDto);
+            return new SearchDtoResponse(total, titles, termsAggList);
         } catch(IOException ex) {
             throw new RuntimeException(ex);
         }
     }
 
+    private Map<String, Long> getTermAggregation(String key, SearchResponse response) {
+        Terms terms = response.getAggregations().get(key);
+        Map<String, Long> dto = new HashMap<>();
+        for (Terms.Bucket bucket : terms.getBuckets()) {
+            dto.put(bucket.getKeyAsString(), bucket.getDocCount());
+        }
+        return dto;
+    }
+
     private void addAggregations(SearchSourceBuilder requestBuilder) {
         requestBuilder.aggregation(AggregationBuilders.terms("genres").field("genres.keyword"));
+        requestBuilder.aggregation(AggregationBuilders.terms("type").field("titleType.keyword"));
     }
 
     private QueryBuilder buildQuery(String searchText, String genres, String types, String ranges) {
