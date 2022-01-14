@@ -13,6 +13,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.range.Range;
+import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
@@ -58,6 +60,7 @@ public class SearchService {
             Map<String, Map<String, Long>> termsAggList = new HashMap<>();
             termsAggList.put("genres", getTermAggregation("genres", response));
             termsAggList.put("types", getTermAggregation("type", response));
+            termsAggList.put("ranges", getRangeAggregation(response));
 
             return new SearchDtoResponse(total, titles, termsAggList);
         } catch(IOException ex) {
@@ -74,9 +77,23 @@ public class SearchService {
         return dto;
     }
 
+    private Map<String, Long> getRangeAggregation(SearchResponse response) {
+        Range range = response.getAggregations().get("ranges");
+        Map<String, Long> dto = new HashMap<>();
+        for (Range.Bucket bucket : range.getBuckets()) {
+            dto.put(bucket.getKeyAsString(), bucket.getDocCount());
+        }
+        return dto;
+    }
+
     private void addAggregations(SearchSourceBuilder requestBuilder) {
         requestBuilder.aggregation(AggregationBuilders.terms("genres").field("genres.keyword"));
         requestBuilder.aggregation(AggregationBuilders.terms("type").field("titleType.keyword"));
+        RangeAggregationBuilder rangeAgg = AggregationBuilders.range("ranges").field("startYear");
+        for (int i = 1900; i < 2020; i += 10) {
+            rangeAgg.addRange(i, i + 10);
+        }
+        requestBuilder.aggregation(rangeAgg);
     }
 
     private QueryBuilder buildQuery(String searchText, String genres, String types, String ranges) {
