@@ -91,7 +91,8 @@ public class SearchService {
         requestBuilder.aggregation(AggregationBuilders.terms("type").field("titleType.keyword"));
         RangeAggregationBuilder rangeAgg = AggregationBuilders.range("ranges").field("startYear");
         for (int i = 1900; i < 2020; i += 10) {
-            rangeAgg.addRange(i, i + 10);
+            String key = i + "-" + (i+10);
+            rangeAgg.addRange(key, i, i + 10);
         }
         requestBuilder.aggregation(rangeAgg);
     }
@@ -101,9 +102,11 @@ public class SearchService {
         queryBuilder.must(QueryBuilders.matchQuery("primaryTitle", searchText));
         if (genres != null) {
             String[] genresSplit = genres.split(",");
+            BoolQueryBuilder genresQuery = QueryBuilders.boolQuery();
             for (String genre : genresSplit) {
-                queryBuilder.must(QueryBuilders.matchQuery("genres", genre));
+                genresQuery.should(QueryBuilders.matchQuery("genres", genre));
             }
+            queryBuilder.must(genresQuery);
         }
         if (types != null) {
             String[] typesSplit = types.split(",");
