@@ -96,7 +96,7 @@ Install Docker, Elasticsearch and Maven
    git clone https://github.com/uo271773/imdb-search.git
    ```
 2. Execute it with your favourite IDE or with the command (on the root folder of the project)
-  ```sh
+   ```sh
    mvn spring-boot:run
    ```
 
@@ -107,7 +107,7 @@ Install Docker, Elasticsearch and Maven
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-###Request
+### Request
 
 The endpoint `/search` is used to search and filter a title.
 Mandatory parameter:
@@ -133,7 +133,7 @@ primary title, filtered by genre 'action' AND type 'movie' OR 'tvEpisode',
 included on ranges '2000-2001' (both included) OR '2008-2015'
 (both included)
 
-###Response
+### Response
 
 The response is a json object which contains the following fields:
 * `total`: Total number of results for the query.
