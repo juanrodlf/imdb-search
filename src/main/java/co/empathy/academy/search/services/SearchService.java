@@ -87,8 +87,8 @@ public class SearchService {
     }
 
     private void addAggregations(SearchSourceBuilder requestBuilder) {
-        requestBuilder.aggregation(AggregationBuilders.terms("genres").field("genres.keyword"));
-        requestBuilder.aggregation(AggregationBuilders.terms("type").field("titleType.keyword"));
+        requestBuilder.aggregation(AggregationBuilders.terms("genres").field("genres"));
+        requestBuilder.aggregation(AggregationBuilders.terms("type").field("titleType"));
         RangeAggregationBuilder rangeAgg = AggregationBuilders.range("ranges").field("startYear");
         for (int i = 1900; i < 2020; i += 10) {
             String key = i + "-" + (i+10);
@@ -103,6 +103,7 @@ public class SearchService {
         if (genres != null) {
             String[] genresSplit = genres.split(",");
             BoolQueryBuilder genresQuery = QueryBuilders.boolQuery();
+            genresQuery.minimumShouldMatch(1);
             for (String genre : genresSplit) {
                 genresQuery.should(QueryBuilders.matchQuery("genres", genre));
             }

@@ -91,7 +91,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
     public void filterByOneGenreTest() throws Exception {
         String expectedTConst = "tt0964012";
         mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "spiderman")
-                .param("genre","crime"))
+                .param("genre","Crime"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.items[0].primaryTitle").value("Spiderman"))
@@ -103,7 +103,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
     public void filterByTwoGenreTest() throws Exception {
         String expectedTConst = "tt0964012";
         mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "spiderman")
-                        .param("genre","crime,documentary"))
+                        .param("genre","Crime,Documentary"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.items[0].primaryTitle").value("Spiderman"))
@@ -134,7 +134,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
     public void filterByOneNonExistingOneExistingGenreTest() throws Exception {
         String expectedTConst = "tt0964012";
         mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "spiderman")
-                        .param("genre","crime,nonExisting"))
+                        .param("genre","Crime,nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(1))
