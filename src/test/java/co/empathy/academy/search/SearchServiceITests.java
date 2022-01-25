@@ -4,7 +4,6 @@ import co.empathy.academy.search.elastic.DefaultSearchServiceITests;
 import co.empathy.academy.search.services.IndexService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.hamcrest.core.IsIterableContaining;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -31,7 +29,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
     static void setUp(@Autowired IndexService indexService) throws IOException, InterruptedException {
         ELASTICSEARCH_CONTAINER.start();
         String dataPath = new File(Objects.requireNonNull(SearchServiceITests.class.getClassLoader().getResource("testdatasearch.tsv")).getFile()).getAbsolutePath();
-        indexService.indexFromTsv(dataPath);
+        indexService.indexFromTsv(dataPath, null);
     }
 
 

@@ -1,5 +1,5 @@
 {
-  "mappings" : {
+  "mappings": {
     "properties": {
       "tConst": {
         "type": "keyword"
@@ -32,25 +32,35 @@
       }
     }
   },
-  "settings" : {
+  "settings": {
     "analysis": {
       "analyzer": {
         "title_search_analyzer": {
           "type": "custom",
           "tokenizer": "whitespace",
-          "filter": ["asciifolding","lowercase", "flatten_graph", "synonym_filter", "custom_word_delimiter", "trim"],
-          "char-filter": ["html_strip"]
+          "filter": [
+            "trim",
+            "lowercase",
+            "asciifolding",
+            "synonym_filter",
+            "roman_numerals",
+            "custom_word_delimiter",
+            "flatten_graph"
+          ],
+          "char-filter": [
+            "html_strip"
+          ]
         }
-      }
-    },
-    "filter": {
-      "custom_word_delimiter": {
-        "type": "word_delimiter_graph",
-        "catenate_all": true
       },
-      "synonym_filter": {
-        "type": "synonym",
-        "synonyms_path": "analysis/synonyms.txt"
+      "filter": {
+        "custom_word_delimiter": {
+          "type": "word_delimiter_graph",
+          "catenate_all": true
+        },
+        "synonym_filter": {
+          "type": "synonym",
+          "synonyms_path": "analysis/synonyms.txt"
+        }
       }
     }
   }

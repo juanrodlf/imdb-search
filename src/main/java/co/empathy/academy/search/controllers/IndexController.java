@@ -16,9 +16,9 @@ public class IndexController {
     private IndexService service;
 
     @PostMapping("/index")
-    public ResponseEntity<?> index(@RequestParam String path) {
+    public ResponseEntity<?> index(@RequestParam String path, @RequestParam(required = false) String ratingsPath) {
         try {
-            service.indexFromTsv(path);
+            service.indexFromTsv(path, ratingsPath);
             return ResponseEntity.ok().build();
         }
         catch (IOException | InterruptedException ex) {
@@ -26,4 +26,14 @@ public class IndexController {
         }
     }
 
+    @PostMapping("/index/delete")
+    public ResponseEntity<?> deleteIndex(@RequestParam String index) {
+        try {
+            service.deleteIndex(index);
+            return ResponseEntity.ok().build();
+        }
+        catch(Exception ex) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
