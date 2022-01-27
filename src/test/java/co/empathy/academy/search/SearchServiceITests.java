@@ -1,7 +1,10 @@
 package co.empathy.academy.search;
 
 import co.empathy.academy.search.elastic.DefaultSearchServiceITests;
-import co.empathy.academy.search.services.IndexService;
+import co.empathy.academy.search.services.index.IndexService;
+import co.empathy.academy.search.services.index.exceptions.IndexAlreadyExistsException;
+import co.empathy.academy.search.services.index.exceptions.IndexFailedException;
+import co.empathy.academy.search.services.index.exceptions.TitlesFilesNotFoundException;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
@@ -26,7 +29,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
     private MockMvc mvc;
 
     @BeforeAll
-    static void setUp(@Autowired IndexService indexService) throws IOException, InterruptedException {
+    static void setUp(@Autowired IndexService indexService) throws IOException, TitlesFilesNotFoundException, IndexFailedException, IndexAlreadyExistsException {
         ELASTICSEARCH_CONTAINER.start();
         String dataPath = new File(Objects.requireNonNull(SearchServiceITests.class.getClassLoader().getResource("testdatasearch.tsv")).getFile()).getAbsolutePath();
         indexService.indexFromTsv(dataPath, null);

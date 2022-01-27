@@ -3,6 +3,8 @@ package co.empathy.academy.search.controllers;
 
 import co.empathy.academy.search.responses.SearchDtoResponse;
 import co.empathy.academy.search.services.search.SearchService;
+import co.empathy.academy.search.services.search.exceptions.ElasticUnavailableException;
+import co.empathy.academy.search.services.search.exceptions.EmptyQueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,8 +20,9 @@ public class SearchController {
     public SearchDtoResponse search(@RequestParam String query,
                                     @RequestParam(required = false) String genre,
                                     @RequestParam(required = false) String type,
-                                    @RequestParam(required = false) String year) {
-        return searchService.getQuery(query, genre, type, year);
+                                    @RequestParam(required = false) String year)
+            throws EmptyQueryException, ElasticUnavailableException {
+        return searchService.search(query, genre, type, year);
     }
 
 }

@@ -2,6 +2,8 @@ package co.empathy.academy.search.services.search;
 
 import co.empathy.academy.search.controllers.cluster.ClusterNotFoundException;
 import co.empathy.academy.search.responses.SearchDtoResponse;
+import co.empathy.academy.search.services.search.exceptions.ElasticUnavailableException;
+import co.empathy.academy.search.services.search.exceptions.EmptyQueryException;
 import org.elasticsearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -29,10 +31,17 @@ public class SearchService {
     @Autowired
     private RestHighLevelClient client;
 
-    public SearchDtoResponse getQuery(String searchText, String genres, String types, String ranges) {
+    /**
+     * Searches for the current query
+     * @param searchText Text you want to be searched
+     * @param genres Genres to filter the query, separated by commas (if any)
+     * @param types Types to filter the query, separated by commas (if any)
+     * @param ranges Ranges to filter the query, separated by commas and slashes (if any)
+     * @return The result of the search process
+     */
+    public SearchDtoResponse search(String searchText, String genres, String types, String ranges) throws EmptyQueryException, ElasticUnavailableException {
         if (searchText.trim().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "The query cannot be empty.");
+            throw new EmptyQueryException();
         }
         SearchRequest request = new SearchRequest("imdb");
 
@@ -59,8 +68,27 @@ public class SearchService {
 
             return new SearchDtoResponse(total, titles, termsAggList);
         } catch(IOException ex) {
-            throw new RuntimeException(ex);
+            throw new ElasticUnavailableException(ex);
         }
+    }
+
+    /**
+     * Elasticsearch cluster
+     * @return the name of the cluster
+     * @throws ClusterNotFoundException if the name is not found
+     */
+    public String getClusterName() throws ClusterNotFoundException {
+        String clusterName;
+        try {
+            var request = new ClusterGetSettingsRequest();
+            request.includeDefaults(true);
+            clusterName = client.cluster().getSettings(request, RequestOptions.DEFAULT)
+                    .getSetting("cluster.name");
+        }
+        catch(IOException e) {
+            throw new ClusterNotFoundException(e);
+        }
+        return clusterName;
     }
 
     private Map<String, Long> getTermAggregation(String key, SearchResponse response) {
@@ -79,20 +107,6 @@ public class SearchService {
             dto.put(bucket.getKeyAsString(), bucket.getDocCount());
         }
         return dto;
-    }
-
-    public String getClusterName() {
-        String clusterName;
-        try {
-            var request = new ClusterGetSettingsRequest();
-            request.includeDefaults(true);
-            clusterName = client.cluster().getSettings(request, RequestOptions.DEFAULT)
-                    .getSetting("cluster.name");
-        }
-        catch(IOException e) {
-            throw new ClusterNotFoundException(e);
-        }
-        return clusterName;
     }
 
 }
