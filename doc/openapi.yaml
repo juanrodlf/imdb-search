@@ -1,0 +1,134 @@
+openapi: 3.0.1
+info:
+  description: "Mock Elasticsearch project for the Academy Search Path at Empathy.co."
+  version: "0.1.0"
+  title: "IMDb search"
+  contact:
+    email: "juanr@empathy.co"
+servers:
+  - url: http://localhost:8080/
+paths:
+  /index:
+    post:
+      tags:
+        - index
+      summary: Creates an index from a tsv file.
+      operationId: createIndex
+      parameters:
+        - name: path
+          in: query
+          description: The path of the tsv file containing the IMDb database.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: succesfful operation
+          content: {}
+        400:
+          description: bad request, index already exists
+          content: {}
+  /index/delete:
+    post:
+      tags:
+        - index
+      summary: Deletes the imdb index
+      description: Deletes the imdb index if it exists
+      operationId: deleteIndex
+      responses:
+        200:
+          description: succesful operation
+  /search:
+    get:
+      tags:
+        - search
+      summary: Searches for a title
+      description: Looks for a title in the database with the option of filtering the query.
+      operationId: search
+      parameters:
+        - name: query
+          in: query
+          description: The text the user is searching.
+          required: true
+          schema:
+            type: string
+        - name: genres
+          in: query
+          description: Filters the query by genres separated by comma.
+          required: false
+          schema:
+            type: string
+        - name: types
+          in: query
+          description: Filters the query by types separated by comma.
+          required: false
+          schema:
+            type: string
+        - name: year
+          in: query
+          description: Filters the query by year periods, separated by commas and slashes.
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: succesful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        400:
+          description: Empty query
+          content: {}
+components:
+  schemas:
+    SearchResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
+        aggregations:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
+      example:
+        total: 1
+        items:
+          - id: tt0000001
+            type: short
+            primaryTitle: Carmencita
+            originalTitle: Carmencita
+            isAdult: false
+            startYear: 1894
+            runtimeMinutes: 1
+            genres:
+              - Documentary
+              - Short
+        aggregations:
+          - genres:
+            Documentary: 1
+            Short: 1
+          - types:
+            short: 1
+          - years:
+            1900-1910: 0
+            1910-1920: 0
+            1920-1930: 0
+            1930-1940: 0
+            1940-1950: 0
+            1950-1960: 0
+            1960-1970: 0
+            1970-1980: 0
+            1980-1990: 0
+            1990-2000: 0
+            2000-2010: 0
+            2010-2020: 0
