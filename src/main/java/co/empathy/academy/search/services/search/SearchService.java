@@ -14,10 +14,10 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,20 +56,51 @@ public class SearchService {
             SearchHits hits = response.getHits();
             List<SearchHit> searchHits = List.of(hits.getHits());
             List<Map<String, Object>> titles = new ArrayList<>();
-            for (SearchHit sh : searchHits) {
-                titles.add(sh.getSourceAsMap());
+            long total;
+            if (searchHits.size() == 0) {
+                SuggestQueryBuilder sqb = new SuggestQueryBuilder(searchText);
+                SearchSourceBuilder searchSourceBuilder= sqb.addSuggestions();
+                request.source(searchSourceBuilder);
+                response = client.search(request, RequestOptions.DEFAULT);
+                total = 0;
+                return new SearchDtoResponse(total, null, null, getSuggestions(response));
             }
-            long total = hits.getTotalHits().value;
+            else {
+                for (SearchHit sh : searchHits) {
+                    titles.add(sh.getSourceAsMap());
+                }
+                total = hits.getTotalHits().value;
 
-            Map<String, Map<String, Long>> termsAggList = new HashMap<>();
-            termsAggList.put("genres", getTermAggregation("genres", response));
-            termsAggList.put("types", getTermAggregation("type", response));
-            termsAggList.put("ranges", getRangeAggregation(response));
 
-            return new SearchDtoResponse(total, titles, termsAggList);
+                Map<String, Map<String, Long>> termsAggList = new HashMap<>();
+                termsAggList.put("genres", getTermAggregation("genres", response));
+                termsAggList.put("types", getTermAggregation("type", response));
+                termsAggList.put("ranges", getRangeAggregation(response));
+
+                return new SearchDtoResponse(total, titles, termsAggList, null);
+            }
         } catch(IOException ex) {
             throw new ElasticUnavailableException(ex);
         }
+    }
+
+    private List<Map<String, Object>> getSuggestions(SearchResponse response) {
+        Suggest suggest = response.getSuggest();
+        TermSuggestion termSuggestion = suggest.getSuggestion("spellcheck");
+        List<Map<String, Object>> suggestions = new ArrayList<>();
+        for (TermSuggestion.Entry entry : termSuggestion) {
+            for (TermSuggestion.Entry.Option option : entry) {
+                String suggestText = option.getText().string();
+                Float score = option.getScore();
+                Integer freq = option.getFreq();
+                Map<String, Object> map = new HashMap<>();
+                map.put("text", suggestText);
+                map.put("score", score);
+                map.put("frequency", freq);
+                suggestions.add(map);
+            }
+        }
+        return suggestions;
     }
 
     /**
