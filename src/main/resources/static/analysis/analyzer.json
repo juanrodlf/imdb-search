@@ -9,6 +9,12 @@
       },
       "primaryTitle": {
         "type": "text",
+        "fields": {
+          "trigram": {
+            "type": "text",
+            "analyzer": "trigram"
+          }
+        },
         "analyzer": "title_search_analyzer"
       },
       "originalTitle": {
@@ -34,6 +40,11 @@
   "settings": {
     "analysis": {
       "analyzer": {
+        "trigram": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "shingle"]
+        },
         "title_search_analyzer": {
           "type": "custom",
           "tokenizer": "whitespace",
@@ -74,6 +85,11 @@
             "xiv => 14",
             "xv => 15"
           ]
+        },
+        "shingle": {
+          "type": "shingle",
+          "min_shingle_size": 2,
+          "max_shingle_size": 3
         }
       }
     }

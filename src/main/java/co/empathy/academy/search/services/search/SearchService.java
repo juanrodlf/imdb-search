@@ -15,6 +15,7 @@ import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.phrase.PhraseSuggestion;
 import org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -92,11 +93,9 @@ public class SearchService {
             for (TermSuggestion.Entry.Option option : entry) {
                 String suggestText = option.getText().string();
                 Float score = option.getScore();
-                Integer freq = option.getFreq();
                 Map<String, Object> map = new HashMap<>();
                 map.put("text", suggestText);
                 map.put("score", score);
-                map.put("frequency", freq);
                 suggestions.add(map);
             }
         }
