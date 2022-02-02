@@ -100,6 +100,12 @@ components:
             type: object
             additionalProperties:
               type: string
+        suggestions:
+          type: array
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
       example:
         total: 1
         items:
@@ -132,3 +138,4 @@ components:
             1990-2000: 0
             2000-2010: 0
             2010-2020: 0
+        suggestions: null

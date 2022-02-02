@@ -60,7 +60,7 @@ public class SearchService {
             long total;
             if (searchHits.size() == 0) {
                 SuggestQueryBuilder sqb = new SuggestQueryBuilder(searchText);
-                SearchSourceBuilder searchSourceBuilder= sqb.addSuggestions();
+                SearchSourceBuilder searchSourceBuilder= sqb.addSuggestionsPhrase();
                 request.source(searchSourceBuilder);
                 response = client.search(request, RequestOptions.DEFAULT);
                 total = 0;
@@ -87,10 +87,10 @@ public class SearchService {
 
     private List<Map<String, Object>> getSuggestions(SearchResponse response) {
         Suggest suggest = response.getSuggest();
-        TermSuggestion termSuggestion = suggest.getSuggestion("spellcheck");
+        PhraseSuggestion termSuggestion = suggest.getSuggestion("spellcheck");
         List<Map<String, Object>> suggestions = new ArrayList<>();
-        for (TermSuggestion.Entry entry : termSuggestion) {
-            for (TermSuggestion.Entry.Option option : entry) {
+        for (PhraseSuggestion.Entry entry : termSuggestion) {
+            for (PhraseSuggestion.Entry.Option option : entry) {
                 String suggestText = option.getText().string();
                 Float score = option.getScore();
                 Map<String, Object> map = new HashMap<>();

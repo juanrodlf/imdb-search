@@ -121,7 +121,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("genre","nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("genre","nonExisting,noExiste"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("type","nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
     }
 
     @Test
@@ -234,7 +234,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("year","1900/1902"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
     }
 
     @Test
@@ -243,7 +243,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("year","1900/1901,1910/1930"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
     }
 
     @Test
@@ -292,13 +292,17 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
         ResultActions actions = mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "queryWithNoResults"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.aggregations.types.length()").value(0))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.aggregations.genres.length()").value(0));
-        for (int i = 1900; i < 2020; i += 10) {
-            actions.andExpect(MockMvcResultMatchers.jsonPath("$.aggregations.ranges." + i + "-" + (i+10))
-                    .value(0));
-        }
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.aggregations").doesNotExist());
+    }
+
+    @Test
+    public void suggestTest() throws Exception {
+        ResultActions actions = mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "irxnman"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.suggestions").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$..suggestions[0].text").value("ironman"));
     }
 
 }

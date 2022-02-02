@@ -233,6 +233,36 @@ Example of response for previous query:
 }
 ```
 
+If the query does not match any title, the response will contain some 
+suggestions. This is an example of searching "irxn man"
+
+```
+{
+   "suggestions" : [
+      {
+         "score" : 0.0046463693,
+         "text" : "iron man"
+      },
+      {
+         "score" : 0.00012659143,
+         "text" : "iran man"
+      },
+      {
+         "score" : 2.5665657e-05,
+         "text" : "irán man"
+      },
+      {
+         "score" : 1.7764054e-05,
+         "text" : "iren man"
+      },
+      {
+         "score" : 1.4895896e-05,
+         "text" : "irin man"
+      }
+   ],
+   "total" : 0
+}
+```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- CONTACT -->
