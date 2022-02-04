@@ -16,7 +16,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.phrase.PhraseSuggestion;
-import org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +37,11 @@ public class SearchService {
      * @param genres Genres to filter the query, separated by commas (if any)
      * @param types Types to filter the query, separated by commas (if any)
      * @param ranges Ranges to filter the query, separated by commas and slashes (if any)
+     * @param start Number of titles to be skipped
+     * @param rows Number of items per page (to be shown in results)
      * @return The result of the search process
      */
-    public SearchDtoResponse search(String searchText, String genres, String types, String ranges) throws EmptyQueryException, ElasticUnavailableException {
+    public SearchDtoResponse search(String searchText, String genres, String types, String ranges, int start, int rows) throws EmptyQueryException, ElasticUnavailableException {
         if (searchText.trim().isEmpty()) {
             throw new EmptyQueryException();
         }
@@ -49,6 +50,13 @@ public class SearchService {
         SearchSourceBuilder requestBuilder = new SearchSourceBuilder();
         SearchQueryBuilder searchQueryBuilder = new SearchQueryBuilder(searchText, genres, types, ranges, requestBuilder);
         requestBuilder.query(searchQueryBuilder.buildQuery());
+        requestBuilder.from(start);
+        if (rows != 0) {
+            requestBuilder.size(rows);
+        }
+        else {
+            requestBuilder.size(10);
+        }
         searchQueryBuilder.addAggregations();
         request.source(requestBuilder);
         try {
@@ -71,7 +79,6 @@ public class SearchService {
                     titles.add(sh.getSourceAsMap());
                 }
                 total = hits.getTotalHits().value;
-
 
                 Map<String, Map<String, Long>> termsAggList = new HashMap<>();
                 termsAggList.put("genres", getTermAggregation("genres", response));
