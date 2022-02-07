@@ -73,20 +73,20 @@ public class SearchQueryBuilder {
 
     private FunctionScoreQueryBuilder.FilterFunctionBuilder[] getFunctions() {
         return new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{
-                new FunctionScoreQueryBuilder
-                        .FilterFunctionBuilder(
-                        fieldValueFactorFunction("numVotes")
-                                .factor(1.2f)
-                                .modifier(FieldValueFactorFunction.Modifier.SQRT)
-                                .missing(1.)),
-                new FunctionScoreQueryBuilder
-                        .FilterFunctionBuilder(
-                        fieldValueFactorFunction("averageRating")
+            new FunctionScoreQueryBuilder
+                    .FilterFunctionBuilder(
+                    fieldValueFactorFunction("numVotes")
+                            .factor(1.2f)
+                            .modifier(FieldValueFactorFunction.Modifier.SQRT)
+                            .missing(1.)),
+            new FunctionScoreQueryBuilder
+                    .FilterFunctionBuilder(
+                            fieldValueFactorFunction("averageRating")
                                 .factor(1.0f)
                                 .modifier(FieldValueFactorFunction.Modifier.SQRT)
                                 .missing(1.)),
-                new FunctionScoreQueryBuilder
-                        .FilterFunctionBuilder(exponentialDecayFunction("startYear", "2022", 1))
+            new FunctionScoreQueryBuilder
+                    .FilterFunctionBuilder(exponentialDecayFunction("startYear", "2022", 1))
         };
     }
 
