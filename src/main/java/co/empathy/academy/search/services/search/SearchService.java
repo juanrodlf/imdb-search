@@ -72,11 +72,13 @@ public class SearchService {
                 request.source(searchSourceBuilder);
                 response = client.search(request, RequestOptions.DEFAULT);
                 total = 0;
-                return new SearchDtoResponse(total, null, null, getSuggestions(response));
+                return new SearchDtoResponse(total, new ArrayList<>(), new HashMap<>(), getSuggestions(response));
             }
             else {
                 for (SearchHit sh : searchHits) {
-                    titles.add(sh.getSourceAsMap());
+                    Map<String, Object> title = sh.getSourceAsMap();
+                    title.put("score", sh.getScore());
+                    titles.add(title);
                 }
                 total = hits.getTotalHits().value;
 
@@ -85,7 +87,7 @@ public class SearchService {
                 termsAggList.put("types", getTermAggregation("type", response));
                 termsAggList.put("ranges", getRangeAggregation(response));
 
-                return new SearchDtoResponse(total, titles, termsAggList, null);
+                return new SearchDtoResponse(total, titles, termsAggList, new ArrayList<>());
             }
         } catch(IOException ex) {
             throw new ElasticUnavailableException(ex);
@@ -141,7 +143,9 @@ public class SearchService {
         Range range = response.getAggregations().get("ranges");
         Map<String, Long> dto = new HashMap<>();
         for (Range.Bucket bucket : range.getBuckets()) {
-            dto.put(bucket.getKeyAsString(), bucket.getDocCount());
+            if (bucket.getDocCount() > 0) {
+                dto.put(bucket.getKeyAsString(), bucket.getDocCount());
+            }
         }
         return dto;
     }

@@ -121,7 +121,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("genre","nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty());
     }
 
     @Test
@@ -130,7 +130,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("genre","nonExisting,noExiste"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("type","nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty());
     }
 
     @Test
@@ -234,7 +234,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("year","1900/1902"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty());
     }
 
     @Test
@@ -243,7 +243,7 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                         .param("year","1900/1901,1910/1930"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty());
     }
 
     @Test
@@ -292,8 +292,8 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
         ResultActions actions = mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "queryWithNoResults"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items").doesNotExist())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.aggregations").doesNotExist());
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items").isEmpty())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.aggregations").isEmpty());
     }
 
     @Test

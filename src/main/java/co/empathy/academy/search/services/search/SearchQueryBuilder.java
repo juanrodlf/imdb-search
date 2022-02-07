@@ -32,7 +32,8 @@ public class SearchQueryBuilder {
     public QueryBuilder buildQuery() {
         BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
         FunctionScoreQueryBuilder fsqb = QueryBuilders.functionScoreQuery(queryBuilder, getFunctions());
-        queryBuilder.must(QueryBuilders.matchPhraseQuery("primaryTitle", searchText));
+        queryBuilder.must(QueryBuilders.multiMatchQuery(searchText, "primaryTitle", "originalTitle")
+                .tieBreaker(0.3F));
         fsqb.scoreMode(FunctionScoreQuery.ScoreMode.AVG);
 
         if (genres != null) {
@@ -71,23 +72,22 @@ public class SearchQueryBuilder {
     }
 
     private FunctionScoreQueryBuilder.FilterFunctionBuilder[] getFunctions() {
-        FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions = {
-            new FunctionScoreQueryBuilder
-                    .FilterFunctionBuilder(
-                    fieldValueFactorFunction("numVotes")
-                            .factor(1.2f)
-                            .modifier(FieldValueFactorFunction.Modifier.SQRT)
-                            .missing(1.)),
-            new FunctionScoreQueryBuilder
-                    .FilterFunctionBuilder(
-                            fieldValueFactorFunction("averageRating")
+        return new FunctionScoreQueryBuilder.FilterFunctionBuilder[]{
+                new FunctionScoreQueryBuilder
+                        .FilterFunctionBuilder(
+                        fieldValueFactorFunction("numVotes")
+                                .factor(1.2f)
+                                .modifier(FieldValueFactorFunction.Modifier.SQRT)
+                                .missing(1.)),
+                new FunctionScoreQueryBuilder
+                        .FilterFunctionBuilder(
+                        fieldValueFactorFunction("averageRating")
                                 .factor(1.0f)
                                 .modifier(FieldValueFactorFunction.Modifier.SQRT)
                                 .missing(1.)),
-            new FunctionScoreQueryBuilder
-                    .FilterFunctionBuilder(exponentialDecayFunction("startYear", "2022", 1))
+                new FunctionScoreQueryBuilder
+                        .FilterFunctionBuilder(exponentialDecayFunction("startYear", "2022", 1))
         };
-        return functions;
     }
 
     public void addAggregations() {
