@@ -107,7 +107,21 @@ Install Docker, Elasticsearch and Maven
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### Request
+### Indexing
+The endpoint `/index` is used to create an index of documents from a *.tsv* file. 
+You can use the *title.basics.tsv.gz* and *title.ratings.tsv.gz* from [IMDb Webpage](https://www.imdb.com/interfaces/).
+Mandatory parameter:
+* `path`: Path to the tsv file containing the titles to be indexed.
+
+Optional parameters:
+* `ratingsPath`: Path to the tsv file containing the ratings for the titles
+
+Example of usage:
+  ```sh
+   curl -d "path=pathToTitlesFile.tsv&ratingsPath=pathToRatingsFile.tsv" -X POST http://localhost:8080/index
+   ```
+
+### Search request
 
 The endpoint `/search` is used to search and filter a title.
 Mandatory parameter:
@@ -133,7 +147,7 @@ primary title, filtered by genre 'action' AND type 'movie' OR 'tvEpisode',
 included on ranges '2000-2001' (both included) OR '2008-2015'
 (both included)
 
-### Response
+### Search response
 
 The response is a json object which contains the following fields:
 * `total`: Total number of results for the query.
