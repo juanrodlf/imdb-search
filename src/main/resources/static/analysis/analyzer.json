@@ -18,7 +18,8 @@
         "analyzer": "title_search_analyzer"
       },
       "originalTitle": {
-        "type": "text"
+        "type": "text",
+        "analyzer": "title_search_analyzer"
       },
       "isAdult": {
         "type": "boolean"

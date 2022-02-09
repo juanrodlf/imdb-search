@@ -126,7 +126,7 @@ results will include all of them.
 
 Example:
   ```sh
-   curl "localhost:8080/search?query=spiderman&genre=action&type=movie,tvEpisode&year=2000/2001,2008/2015"
+   curl "localhost:8080/search?query=spiderman&genre=Action&type=Movie,tvEpisode&year=2000/2001,2008/2015"
    ```
 This query would search all the titles containing 'spiderman' on 
 primary title, filtered by genre 'action' AND type 'movie' OR 'tvEpisode',
@@ -147,120 +147,235 @@ Example of response for previous query:
 
 ```{toggle}
 {
-   "aggregations" : {
-      "genres" : {
-         "Action" : 4,
-         "Adventure" : 2,
-         "Comedy" : 2
-      },
-      "ranges" : {
-         "1900-1910" : 0,
-         "1910-1920" : 0,
-         "1920-1930" : 0,
-         "1930-1940" : 0,
-         "1940-1950" : 0,
-         "1950-1960" : 0,
-         "1960-1970" : 0,
-         "1970-1980" : 0,
-         "1980-1990" : 0,
-         "1990-2000" : 0,
-         "2000-2010" : 0,
-         "2010-2020" : 4
-      },
-      "types" : {
-         "tvEpisode" : 4
-      }
-   },
-   "items" : [
+   "total":27,
+   "items":[
       {
-         "endYear" : null,
-         "genres" : [
-            "Action"
-         ],
-         "isAdult" : false,
-         "originalTitle" : "Spiderman 2011",
-         "primaryTitle" : "Spiderman 2011",
-         "runtimeMinutes" : null,
-         "startYear" : 2012,
-         "tConst" : "tt4198962",
-         "titleType" : "tvEpisode"
-      },
-      {
-         "endYear" : null,
-         "genres" : [
-            "Action"
-         ],
-         "isAdult" : false,
-         "originalTitle" : "Gentleman Spiderman",
-         "primaryTitle" : "Gentleman Spiderman",
-         "runtimeMinutes" : null,
-         "startYear" : 2013,
-         "tConst" : "tt4199102",
-         "titleType" : "tvEpisode"
-      },
-      {
-         "endYear" : null,
-         "genres" : [
+         "primaryTitle":"The Amazing Spider-Man",
+         "titleType":"movie",
+         "runtimeMinutes":136,
+         "score":4107.2383,
+         "originalTitle":"The Amazing Spider-Man",
+         "genres":[
             "Action",
             "Adventure",
-            "Comedy"
+            "Sci-Fi"
          ],
-         "isAdult" : false,
-         "originalTitle" : "Honest Review: Spiderman 1 & 2",
-         "primaryTitle" : "Honest Review: Spiderman 1 & 2",
-         "runtimeMinutes" : 9,
-         "startYear" : 2012,
-         "tConst" : "tt2384655",
-         "titleType" : "tvEpisode"
+         "averageRating":6.9,
+         "startYear":2012,
+         "tConst":"tt0948470",
+         "numVotes":621683,
+         "isAdult":false
       },
       {
-         "endYear" : null,
-         "genres" : [
+         "primaryTitle":"The Amazing Spider-Man 2",
+         "titleType":"movie",
+         "runtimeMinutes":142,
+         "score":3309.829,
+         "originalTitle":"The Amazing Spider-Man 2",
+         "genres":[
             "Action",
             "Adventure",
+            "Sci-Fi"
+         ],
+         "averageRating":6.6,
+         "startYear":2014,
+         "tConst":"tt1872181",
+         "numVotes":469525,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"I Am Spider-Man",
+         "titleType":"tvEpisode",
+         "runtimeMinutes":23,
+         "score":84.31079,
+         "originalTitle":"I Am Spider-Man",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":7.2,
+         "startYear":2012,
+         "tConst":"tt2016724",
+         "numVotes":190,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"Itsy Bitsy Spider-Man",
+         "titleType":"tvEpisode",
+         "runtimeMinutes":23,
+         "score":77.298096,
+         "originalTitle":"Itsy Bitsy Spider-Man",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":7.1,
+         "startYear":2013,
+         "tConst":"tt2949840",
+         "numVotes":155,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"The Savage Spider-Man",
+         "titleType":"tvEpisode",
+         "runtimeMinutes":23,
+         "score":71.98677,
+         "originalTitle":"The Savage Spider-Man",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":7.5,
+         "startYear":2014,
+         "tConst":"tt3105108",
+         "numVotes":129,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"The Avenging Spider-Man: Part 1",
+         "titleType":"tvEpisode",
+         "runtimeMinutes":23,
+         "score":67.9639,
+         "originalTitle":"The Avenging Spider-Man: Part 1",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":8.2,
+         "startYear":2014,
+         "tConst":"tt3091022",
+         "numVotes":156,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"The Avenging Spider-Man: Part 2",
+         "titleType":"tvEpisode",
+         "runtimeMinutes":23,
+         "score":65.75958,
+         "originalTitle":"The Avenging Spider-Man: Part 2",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":8.2,
+         "startYear":2014,
+         "tConst":"tt3105060",
+         "numVotes":144,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"The Avenging Spider-Man",
+         "titleType":"movie",
+         "runtimeMinutes":48,
+         "score":50.858482,
+         "originalTitle":"The Avenging Spider-Man",
+         "genres":[
+            "Action",
+            "Sci-Fi",
+            "Thriller"
+         ],
+         "averageRating":6,
+         "startYear":2015,
+         "tConst":"tt4321248",
+         "numVotes":57,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"Batman VS Spider-Man",
+         "titleType":"tvEpisode",
+         "score":41.380707,
+         "originalTitle":"Batman VS Spider-Man",
+         "genres":[
+            "Action",
+            "Animation",
             "Comedy"
          ],
-         "isAdult" : false,
-         "originalTitle" : "Top 10 Un-Amazing Spiderman 2 Moments",
-         "primaryTitle" : "Top 10 Un-Amazing Spiderman 2 Moments",
-         "runtimeMinutes" : 26,
-         "startYear" : 2014,
-         "tConst" : "tt4143124",
-         "titleType" : "tvEpisode"
+         "averageRating":8,
+         "startYear":2012,
+         "tConst":"tt4128544",
+         "numVotes":29,
+         "isAdult":false
+      },
+      {
+         "primaryTitle":"Spider-Man",
+         "titleType":"tvEpisode",
+         "score":33.7278,
+         "originalTitle":"Spider-Man",
+         "genres":[
+            "Action",
+            "Adventure",
+            "Animation"
+         ],
+         "averageRating":9.1,
+         "startYear":2013,
+         "tConst":"tt6353072",
+         "numVotes":7,
+         "isAdult":false
       }
    ],
-   "total" : 4
+   "aggregations":{
+      "types":{
+         "movie":4,
+         "tvEpisode":23
+      },
+      "ranges":{
+         "2010-2020":27
+      },
+      "genres":{
+         "Action":27,
+         "Sci-Fi":3,
+         "Adventure":19,
+         "Thriller":1,
+         "Animation":15,
+         "Family":1,
+         "Comedy":9
+      }
+   },
+   "suggestions":[
+      
+   ]
 }
 ```
 
 If the query does not match any title, the response will contain some 
-suggestions. This is an example of searching "irxn man"
+suggestions. This is an example of searching "irxnman"
 
 ```
 {
-   "suggestions" : [
-      {
-         "score" : 0.0046463693,
-         "text" : "iron man"
-      },
-      {
-         "score" : 0.00012659143,
-         "text" : "iran man"
-      },
-      {
-         "score" : 2.5665657e-05,
-         "text" : "irán man"
-      },
-      {
-         "score" : 1.7764054e-05,
-         "text" : "iren man"
-      },
-      {
-         "score" : 1.4895896e-05,
-         "text" : "irin man"
-      }
+   "total":0,
+   "items":[
+      
    ],
-   "total" : 0
+   "aggregations":{
+      
+   },
+   "suggestions":[
+      {
+         "score":0.0046554636,
+         "text":"iron man"
+      },
+      {
+         "score":0.0027191767,
+         "text":"iranian"
+      },
+      {
+         "score":0.0024995566,
+         "text":"ironman"
+      },
+      {
+         "score":0.00068895257,
+         "text":"ironmen"
+      },
+      {
+         "score":0.00046277102,
+         "text":"iranían"
+      }
+   ]
 }
 ```
 <p align="right">(<a href="#top">back to top</a>)</p>

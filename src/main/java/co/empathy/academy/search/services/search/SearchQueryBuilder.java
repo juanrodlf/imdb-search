@@ -41,7 +41,7 @@ public class SearchQueryBuilder {
             BoolQueryBuilder genresQuery = QueryBuilders.boolQuery();
             genresQuery.minimumShouldMatch(1);
             for (String genre : genresSplit) {
-                genresQuery.should(QueryBuilders.matchQuery("genres", genre));
+                genresQuery.should(QueryBuilders.termQuery("genres", genre).caseInsensitive(true));
             }
             queryBuilder.must(genresQuery);
         }
@@ -49,7 +49,7 @@ public class SearchQueryBuilder {
             String[] typesSplit = types.split(",");
             BoolQueryBuilder typesQuery = QueryBuilders.boolQuery();
             for (String type : typesSplit) {
-                typesQuery.should(QueryBuilders.matchQuery("titleType", type));
+                typesQuery.should(QueryBuilders.termQuery("titleType", type).caseInsensitive(true));
             }
             queryBuilder.must(typesQuery);
         }
@@ -68,6 +68,7 @@ public class SearchQueryBuilder {
             }
             queryBuilder.must(rangeQueries);
         }
+        logger.info(fsqb.toString());
         return fsqb;
     }
 
