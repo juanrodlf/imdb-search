@@ -51,12 +51,7 @@ public class SearchService {
         SearchQueryBuilder searchQueryBuilder = new SearchQueryBuilder(searchText, genres, types, ranges, requestBuilder);
         requestBuilder.query(searchQueryBuilder.buildQuery());
         requestBuilder.from(start);
-        if (rows != 0) {
-            requestBuilder.size(rows);
-        }
-        else {
-            requestBuilder.size(10);
-        }
+        requestBuilder.size(rows);
         searchQueryBuilder.addAggregations();
         request.source(requestBuilder);
         try {

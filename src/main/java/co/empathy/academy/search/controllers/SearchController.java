@@ -22,7 +22,7 @@ public class SearchController {
                                     @RequestParam(required = false) String type,
                                     @RequestParam(required = false) String year,
                                     @RequestParam(required = false, defaultValue = "0") int start,
-                                    @RequestParam(required = false, defaultValue = "0") int rows)
+                                    @RequestParam(required = false, defaultValue = "10") int rows)
             throws EmptyQueryException, ElasticUnavailableException {
         return searchService.search(query, genre, type, year, start, rows);
     }

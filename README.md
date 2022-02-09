@@ -137,6 +137,8 @@ at least one of the specified genres.
 * `year`: Filters by ranges of years, they can be separated by a comma.
 Format is YYYY/YYYY,YYYY/YYYY,etc. If there are more than one range,
 results will include all of them. 
+* `start`: Starting document offset. Defaults to 0.
+* `rows`: Defines the number of hits to return. Defaults to 10.
 
 Example:
   ```sh
