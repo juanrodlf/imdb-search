@@ -131,7 +131,7 @@ Optional parameters:
 * `type`: Filters result by types, they can be separated by a comma.
 If there are more than one, results will include titles with at least
 one of the specified types.
-* `genres`: Filters result by genres, they can be separated by a comma.
+* `genre`: Filters result by genres, they can be separated by a comma.
 If there are more than one, results will include titles with 
 at least one of the specified genres.
 * `year`: Filters by ranges of years, they can be separated by a comma.
@@ -153,7 +153,7 @@ included on ranges '2000-2001' (both included) OR '2008-2015'
 
 The response is a json object which contains the following fields:
 * `total`: Total number of results for the query.
-* `items`: A list containing the first 10 titles retrieved.
+* `items`: A list containing the titles retrieved and the score for each one.
 * `aggregations`: Total results depending on fields:
   * `genres`: Number of results of each gender for the query.
   * `types`: Number of results depending on each type for the query.
