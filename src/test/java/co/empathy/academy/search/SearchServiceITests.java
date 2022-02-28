@@ -135,13 +135,11 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
 
     @Test
     public void filterByOneNonExistingOneExistingGenreTest() throws Exception {
-        String expectedTConst = "tt0964012";
         mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "spiderman")
                         .param("genre","Crime,nonExisting"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.items[0].tConst").value(expectedTConst));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(0));
     }
 
     //Type tests
@@ -303,6 +301,17 @@ public class SearchServiceITests extends DefaultSearchServiceITests {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.suggestions").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$..suggestions[0].text").value("ironman"));
+    }
+
+    @Test
+    public void paginationTest() throws Exception {
+        mvc.perform(MockMvcRequestBuilders.get("/search").param("query", "Ironman")
+                        .param("start", "1")
+                        .param("rows", "2"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items.length()").value(2))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.items[0].tConst").value("tt1234568"));
     }
 
 }

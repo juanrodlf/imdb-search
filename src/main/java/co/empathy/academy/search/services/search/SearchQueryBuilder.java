@@ -39,9 +39,8 @@ public class SearchQueryBuilder {
         if (genres != null) {
             String[] genresSplit = genres.split(",");
             BoolQueryBuilder genresQuery = QueryBuilders.boolQuery();
-            genresQuery.minimumShouldMatch(1);
             for (String genre : genresSplit) {
-                genresQuery.should(QueryBuilders.termQuery("genres", genre).caseInsensitive(true));
+                genresQuery.must(QueryBuilders.termQuery("genres", genre).caseInsensitive(true));
             }
             queryBuilder.must(genresQuery);
         }

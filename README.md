@@ -133,7 +133,7 @@ If there are more than one, results will include titles with at least
 one of the specified types.
 * `genre`: Filters result by genres, they can be separated by a comma.
 If there are more than one, results will include titles with 
-at least one of the specified genres.
+all the specified genres.
 * `year`: Filters by ranges of years, they can be separated by a comma.
 Format is YYYY/YYYY,YYYY/YYYY,etc. If there are more than one range,
 results will include all of them. 
